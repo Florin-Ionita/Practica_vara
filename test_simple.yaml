@@ -1,0 +1,10 @@
+# Simple SAT test case
+# (A or B) and (A or C) and (-B or D) and (-C or D)
+# This has pure literals A and D
+description: "Simple test case with pure literals A and D"
+clauses:
+  - ["A", "B"]        # (A or B)
+  - ["A", "C"]        # (A or C)
+  - ["-B", "D"]       # (not B or D)
+  - ["-C", "D"]       # (not C or D)
+expected: "SAT"

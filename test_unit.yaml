@@ -1,0 +1,9 @@
+# Unit clause propagation test
+# (A) and (-A or B) and (-B or C)
+# Should propagate: A=True, then B=True, then C=True
+description: "Unit clause propagation test"
+clauses:
+  - ["A"]              # (A) - unit clause
+  - ["-A", "B"]        # (not A or B)
+  - ["-B", "C"]        # (not B or C)
+expected: "SAT"

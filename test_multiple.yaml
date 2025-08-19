@@ -1,0 +1,8 @@
+# Multiple solutions test case
+# (A or B) and (C or D)
+# This should have 4 solutions: A∧C, A∧D, B∧C, B∧D
+description: "Test case with multiple solutions"
+clauses:
+  - ["A", "B"]        # (A or B)
+  - ["C", "D"]        # (C or D)
+expected: "SAT"
