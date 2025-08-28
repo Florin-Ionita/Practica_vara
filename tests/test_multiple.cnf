@@ -1,0 +1,9 @@
+c Test case with multiple solutions
+c Variable mapping:
+c A = 1
+c B = 2
+c C = 3
+c D = 4
+p cnf 4 2
+1 2 0
+3 4 0

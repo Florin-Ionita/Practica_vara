@@ -1,0 +1,6 @@
+c Simple 3-variable SAT problem for quantum testing
+c Formula: (x1 v x2 v x3) ^ (~x1 v ~x2 v ~x3)
+c This has exactly 6 satisfying assignments out of 8 possible
+p cnf 3 2
+1 2 3 0
+-1 -2 -3 0

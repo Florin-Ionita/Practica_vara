@@ -15,3 +15,11 @@ class Variable:
     
     def __repr__(self):
         return ("-" if not self.positive else "") + self.name
+    
+    def is_positive(self):
+        """Return True if this is a positive literal"""
+        return self.positive
+    
+    def is_negative(self):
+        """Return True if this is a negative literal"""
+        return not self.positive

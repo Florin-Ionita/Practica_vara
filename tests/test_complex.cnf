@@ -1,0 +1,23 @@
+c Complex test case with many variables for timing comparison
+c Variable mapping:
+c A = 1
+c B = 2
+c C = 3
+c D = 4
+c E = 5
+c F = 6
+c G = 7
+c H = 8
+c I = 9
+c J = 10
+c K = 11
+c L = 12
+p cnf 12 8
+1 2 3 0
+4 5 6 0
+-1 7 0
+-2 8 0
+-3 9 0
+-4 10 0
+-5 11 0
+-6 12 0
