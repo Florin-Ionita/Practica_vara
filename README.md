@@ -36,29 +36,39 @@ from backtrack_solver import find_all_solutions_backtrack
 solutions, time = find_all_solutions_backtrack(clauses)
 ```
 
-## 3. Quantum Solver (`quantum_solver.py`)
-**Algorithm:** Grover's Algorithm with quantum amplitude amplification
+## 3. Modern Quantum Solver (`demo_quantum.ipynb`)
+**Algorithm:** Grover's Algorithm using modern Qiskit APIs
 **Type:** Quantum, probabilistic
-**Purpose:** Find satisfying assignments with quantum speedup
+**Purpose:** Demonstrate solving SAT problems on both local simulators and real IBM Quantum hardware.
+
+This project has evolved to use a Jupyter Notebook (`demo_quantum.ipynb`) as the primary interface for quantum solving. It provides a step-by-step workflow from problem definition to hardware execution.
 
 ### Features:
-- Quantum superposition for parallel search
-- Amplitude amplification of satisfying states
-- Theoretical O(√N) speedup over classical brute force
-- Can find multiple solutions in a single quantum run
-- Falls back to classical verification for large instances
+- **Jupyter Notebook Workflow:** Interactive environment for running experiments.
+- **Real Hardware Execution:** Connects to IBM Quantum via `qiskit-ibm-runtime` to run on real devices.
+- **Modern Qiskit Primitives:** Uses the latest `SamplerV2` primitive for both simulation and hardware jobs.
+- **Automated Oracle Creation:** Parses industry-standard DIMACS CNF files directly into a `PhaseOracle`.
+- **Hardware-Aware Transpilation:** Includes the necessary transpilation step (`generate_preset_pass_manager`) to convert the ideal quantum circuit into one that can run on the target backend's specific hardware architecture (ISA).
+- **Advanced Result Handling:** Shows how to process the new `DataBin` result format from `SamplerV2` and includes logic to filter and display the most probable solutions.
 
 ### Dependencies:
+Create a conda environment for this project:
 ```bash
-pip install qiskit qiskit-aer numpy
+conda create -n quantum python=3.10
+conda activate quantum
+pip install qiskit qiskit-aer qiskit-ibm-runtime matplotlib numpy ipykernel
+python -m ipykernel install --user --name=quantum
 ```
 
 ### Usage:
-```python
-from quantum_solver import find_quantum_solution, find_all_quantum_solutions
-solution, time = find_quantum_solution(clauses)
-solutions, time = find_all_quantum_solutions(clauses)
-```
+1.  **Activate Environment:** `conda activate quantum`
+2.  **Launch VS Code and Open Notebook:** Open the `demo_quantum.ipynb` file.
+3.  **Select Kernel:** When prompted, select the `quantum` kernel you just created.
+4.  **Add API Token:** In the second cell, replace the placeholder with your IBM Quantum API token.
+5.  **Run Cells:** Execute the cells sequentially to connect to the service, select a backend, and run the solver on a test file.
+
+## 4. Legacy Quantum Solver (`quantum_solver.py`)
+This is the original, simulator-based implementation of Grover's algorithm. It is less feature-rich than the notebook version and does not support real hardware execution. It is kept for historical and comparative purposes. The `dimacs_test_runner.py` uses this solver when run with the `quantum` command.
 
 ## Performance Comparison
 
@@ -66,36 +76,30 @@ solutions, time = find_all_quantum_solutions(clauses)
 |-------------|----------------|---------------|---------|
 | DPLL | O(2^n) worst case | Single solution needed | First solution |
 | Backtrack | O(2^n) | All solutions needed | All solutions |
-| Quantum | O(√(2^n)) theoretical | Multiple solutions, moderate size | Multiple solutions |
+| Quantum | O(√(2^n)) theoretical | Multiple solutions, hardware demo | Probabilistic solutions |
 
-**Note:** Current quantum implementations run on classical simulators, so practical speedup may not be observed for small instances due to simulation overhead.
+**Note:** Practical quantum speedup is not expected on current noisy, small-scale quantum computers. The primary goal of `demo_quantum.ipynb` is to demonstrate the complete workflow for executing a quantum algorithm on real hardware.
 
 ## Test Runner (`dimacs_test_runner.py`)
 
-Unified test runner supporting DIMACS CNF format with all three solvers:
+Unified test runner for the classical solvers and the legacy quantum solver.
 
 ### Commands:
 ```bash
-# Run classical solver
+# Run DPLL solver
 python3 dimacs_test_runner.py test.cnf
 
-# Run quantum solver
+# Run legacy quantum solver (simulator only)
 python3 dimacs_test_runner.py quantum test.cnf
 
-# Compare all approaches
+# Compare all classical/legacy approaches
 python3 dimacs_test_runner.py compare test.cnf
-
-# Performance timing
-python3 dimacs_test_runner.py timing test.cnf
 
 # Run all tests (from tests/ folder)
 python3 dimacs_test_runner.py all
-
-# Convert YAML to DIMACS
-python3 dimacs_test_runner.py convert test.yaml
 ```
 
-**Note:** Test files are automatically searched in both the current directory and the `tests/` folder, so you can reference them by name without specifying the full path.
+**Note:** To run the modern, hardware-capable quantum solver, please use the `demo_quantum.ipynb` notebook.
 
 ## DIMACS Format
 
@@ -116,66 +120,29 @@ p cnf 3 2
 -1 3 0
 ```
 
-## Quantum Algorithm Details
-
-The quantum solver implements Grover's algorithm for SAT:
-
-1. **Initialization:** Create uniform superposition of all possible assignments
-2. **Oracle:** Mark satisfying assignments by flipping their phase
-3. **Diffusion:** Reflect about the average amplitude
-4. **Iteration:** Repeat oracle + diffusion for optimal number of times
-5. **Measurement:** Observe the quantum state to get solutions
-
-### Theoretical Advantage:
-- Classical brute force: 2^n evaluations
-- Quantum Grover: √(2^n) evaluations
-- Speedup: √(2^n) / 2^n = 1/√(2^n) = 2^(-n/2)
-
-For n=10 variables: 2^5 = 32x theoretical speedup
-For n=20 variables: 2^10 = 1024x theoretical speedup
-
-## Example Usage
-
-```python
-# Create SAT instance
-A, B, C = Variable("A"), Variable("B"), Variable("C")
-clauses = [[A, B], [-A, C], [B, -C]]
-
-# Classical approaches
-dpll_solution, dpll_time = find_first_solution(clauses)
-all_solutions, backtrack_time = find_all_solutions_backtrack(clauses)
-
-# Quantum approach
-quantum_solutions, quantum_time = find_all_quantum_solutions(clauses)
-
-# Compare results
-compare_quantum_classical(clauses)
-```
-
 ## Files Structure
 
 ```
-├── variable.py              # Variable class definition
+├── demo_quantum.ipynb       # Modern, hardware-capable quantum solver notebook
 ├── dpll_solver.py           # DPLL algorithm implementation
 ├── backtrack_solver.py      # Backtracking algorithm implementation
-├── quantum_solver.py        # Quantum Grover algorithm implementation
-├── dimacs_test_runner.py    # Unified test runner
-├── tests/                   # Test files directory
-│   ├── test_simple.cnf      # Simple SAT test case
-│   ├── test_complex.cnf     # Complex SAT test case  
-│   ├── test_multiple.cnf    # Multiple solutions test
-│   ├── test_unit.cnf        # Unit clause test
-│   ├── test_unsat.cnf       # Unsatisfiable test case
-│   └── quantum_test.cnf     # Special quantum test case
+├── dimacs_test_runner.py    # Unified test runner for classical/legacy solvers
+├── quantum_solver.py        # Legacy quantum Grover algorithm (simulator only)
+├── variable.py              # Variable class definition for legacy solvers
+├── tests/                   # Test files directory in DIMACS format
+│   ├── test_simple.cnf
+│   ├── test_complex.cnf  
+│   ├── test_multiple.cnf
+│   ├── test_unit.cnf
+│   ├── test_unsat.cnf
+│   └── ...
 └── README.md                # This file
 ```
 
 ## Research Applications
 
 This suite enables comparative studies of:
-- Classical vs. quantum algorithm performance
-- Solution completeness (single vs. multiple solutions)
-- Scalability analysis across different problem sizes
-- Algorithm behavior on different SAT instance types
-
-The quantum solver demonstrates the principles of quantum computing applied to NP-complete problems, providing insight into potential quantum advantages for computational problems.
+- Classical vs. quantum algorithm performance.
+- The practical workflow of running algorithms on real quantum hardware.
+- Scalability analysis across different problem sizes.
+- Algorithm behavior on different SAT instance types.
