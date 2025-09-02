@@ -1,71 +1,127 @@
 # SAT Solver Suite
 
-This project implements three different approaches to solving the Boolean Satisfiability Problem (SAT):
+This project provides a suite of solvers for the Boolean Satisfiability Problem (SAT), allowing for comparison between classical and quantum approaches. It includes:
 
-## 1. DPLL Solver (`dpll_solver.py`)
-**Algorithm:** Davis-Putnam-Logemann-Loveland (DPLL)
-**Type:** Classical, deterministic
-**Purpose:** Find the first satisfying assignment efficiently
+1.  **DPLL Solver**: A fast, classical algorithm for finding a single SAT solution.
+2.  **Backtracking Solver**: A classical algorithm for finding all possible SAT solutions.
+3.  **Quantum Hardware Solver**: A modern quantum solver using Grover's Algorithm, capable of running on both simulators and real IBM Quantum hardware.
 
-### Features:
-- Unit propagation
-- Pure literal elimination
-- Backtracking search
-- Optimized for finding a single solution quickly
+The project also includes scripts for running individual tests and performing a three-way performance comparison between the solvers.
 
-### Usage:
-```python
-from dpll_solver import find_first_solution
-solution, time = find_first_solution(clauses)
-```
+## Solvers
 
-## 2. Backtrack Solver (`backtrack_solver.py`)
-**Algorithm:** Exhaustive backtracking
-**Type:** Classical, deterministic
-**Purpose:** Find ALL satisfying assignments
+### 1. DPLL Solver (`dpll_solver.py`)
+- **Algorithm:** Davis-Putnam-Logemann-Loveland (DPLL)
+- **Type:** Classical, deterministic
+- **Purpose:** Find the *first* satisfying assignment efficiently.
+- **Features:** Unit propagation, pure literal elimination, and backtracking search.
 
-### Features:
-- Systematic exploration of all possibilities
-- Solution verification
-- Complete enumeration of solution space
-- Early termination for unsatisfiable instances
+### 2. Backtrack Solver (`backtrack_solver.py`)
+- **Algorithm:** Exhaustive backtracking
+- **Type:** Classical, deterministic
+- **Purpose:** Find *all* satisfying assignments.
+- **Features:** Systematic exploration of the entire solution space.
 
-### Usage:
-```python
-from backtrack_solver import find_all_solutions_backtrack
-solutions, time = find_all_solutions_backtrack(clauses)
-```
+### 3. Quantum Hardware Solver (`quantum_hardware_solver.py`)
+- **Algorithm:** Grover's Algorithm
+- **Type:** Quantum, probabilistic
+- **Purpose:** Solve SAT problems on simulators or real IBM Quantum hardware.
+- **Features:**
+    - **Real Hardware Execution:** Connects to IBM Quantum via `qiskit-ibm-runtime`.
+    - **Modern Qiskit Primitives:** Uses the latest `SamplerV2` primitive.
+    - **Automated Oracle Creation:** Parses industry-standard DIMACS CNF files.
+    - **Hardware-Aware Transpilation:** Prepares the quantum circuit to run on the specific architecture of the chosen backend.
+    - **Result Plotting:** Generates and saves a plot of the measurement outcomes.
 
-## 3. Modern Quantum Solver (`demo_quantum.ipynb`)
-**Algorithm:** Grover's Algorithm using modern Qiskit APIs
-**Type:** Quantum, probabilistic
-**Purpose:** Demonstrate solving SAT problems on both local simulators and real IBM Quantum hardware.
+## Dependencies and Setup
 
-This project has evolved to use a Jupyter Notebook (`demo_quantum.ipynb`) as the primary interface for quantum solving. It provides a step-by-step workflow from problem definition to hardware execution.
+It is recommended to use a `conda` environment.
 
-### Features:
-- **Jupyter Notebook Workflow:** Interactive environment for running experiments.
-- **Real Hardware Execution:** Connects to IBM Quantum via `qiskit-ibm-runtime` to run on real devices.
-- **Modern Qiskit Primitives:** Uses the latest `SamplerV2` primitive for both simulation and hardware jobs.
-- **Automated Oracle Creation:** Parses industry-standard DIMACS CNF files directly into a `PhaseOracle`.
-- **Hardware-Aware Transpilation:** Includes the necessary transpilation step (`generate_preset_pass_manager`) to convert the ideal quantum circuit into one that can run on the target backend's specific hardware architecture (ISA).
-- **Advanced Result Handling:** Shows how to process the new `DataBin` result format from `SamplerV2` and includes logic to filter and display the most probable solutions.
+1.  **Create and activate the environment:**
+    ```bash
+    conda create -n quantum-sat python=3.10
+    conda activate quantum-sat
+    ```
 
-### Dependencies:
-Create a conda environment for this project:
+2.  **Install dependencies:**
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+3.  **Set up IBM Quantum Token:**
+    Create a file named `.env` in the root of the project directory and add your IBM Quantum API token to it:
+    ```
+    IBM_QUANTUM_TOKEN="YOUR_API_TOKEN_HERE"
+    ```
+    The `.gitignore` file is already configured to ignore this file.
+
+## Usage
+
+### Main Test Runner (`dimacs_test_runner.py`)
+
+This is the primary script for running tests on individual DIMACS files.
+
+**Commands:**
 ```bash
-conda create -n quantum python=3.10
-conda activate quantum
-pip install qiskit qiskit-aer qiskit-ibm-runtime matplotlib numpy ipykernel
-python -m ipykernel install --user --name=quantum
+# Run the classical backtrack solver on a single file
+python3 dimacs_test_runner.py tests/test_simple.cnf
+
+# Run the classical backtrack solver on all tests in the tests/ directory
+python3 dimacs_test_runner.py all
+
+# Run the quantum hardware solver on a single file
+python3 dimacs_test_runner.py quantum tests/test_simple.cnf
+
+# Run the quantum hardware solver on all tests in the tests/ directory
+python3 dimacs_test_runner.py quantum all
 ```
 
-### Usage:
-1.  **Activate Environment:** `conda activate quantum`
-2.  **Launch VS Code and Open Notebook:** Open the `demo_quantum.ipynb` file.
-3.  **Select Kernel:** When prompted, select the `quantum` kernel you just created.
-4.  **Add API Token:** In the second cell, replace the placeholder with your IBM Quantum API token.
-5.  **Run Cells:** Execute the cells sequentially to connect to the service, select a backend, and run the solver on a test file.
+### Three-Way Comparison (`three_way_comparison.py`)
+
+This script benchmarks the DPLL, Backtrack, and Quantum Hardware solvers against each other for a given DIMACS file, focusing on execution time.
+
+**Command:**
+```bash
+# Run the comparison on a specific file
+python3 three_way_comparison.py tests/test_simple.cnf
+```
+The script will output the execution time for each solver, providing a direct performance comparison.
+
+## DIMACS Format
+
+The DIMACS CNF format is the standard for representing SAT problems:
+```
+c This is a comment
+p cnf <num_variables> <num_clauses>
+<literal> <literal> ... 0
+...
+```
+**Example:** `(x1 ∨ x2) ∧ (¬x1 ∨ x3)`
+```
+c Simple SAT problem
+p cnf 3 2
+1 2 0
+-1 3 0
+```
+
+## File Structure
+```
+.
+├── .env                     # For IBM Quantum API token (ignored by git)
+├── .gitignore
+├── requirements.txt         # Project dependencies
+├── dpll_solver.py           # DPLL algorithm implementation
+├── backtrack_solver.py      # Backtracking algorithm implementation
+├── quantum_hardware_solver.py # Quantum Grover's algorithm for hardware
+├── dimacs_test_runner.py    # Main script for running solvers
+├── three_way_comparison.py  # Script for benchmarking the three solvers
+├── variable.py              # Helper class for solvers
+├── tests/                   # Test files in DIMACS format
+│   ├── test_simple.cnf
+│   └── ...
+└── README.md                # This file
+```
+
 
 ## 4. Legacy Quantum Solver (`quantum_solver.py`)
 This is the original, simulator-based implementation of Grover's algorithm. It is less feature-rich than the notebook version and does not support real hardware execution. It is kept for historical and comparative purposes. The `dimacs_test_runner.py` uses this solver when run with the `quantum` command.
