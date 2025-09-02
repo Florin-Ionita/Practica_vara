@@ -76,17 +76,6 @@ python3 dimacs_test_runner.py quantum tests/test_simple.cnf
 python3 dimacs_test_runner.py quantum all
 ```
 
-### Three-Way Comparison (`three_way_comparison.py`)
-
-This script benchmarks the DPLL, Backtrack, and Quantum Hardware solvers against each other for a given DIMACS file, focusing on execution time.
-
-**Command:**
-```bash
-# Run the comparison on a specific file
-python3 three_way_comparison.py tests/test_simple.cnf
-```
-The script will output the execution time for each solver, providing a direct performance comparison.
-
 ## DIMACS Format
 
 The DIMACS CNF format is the standard for representing SAT problems:
@@ -104,25 +93,6 @@ p cnf 3 2
 -1 3 0
 ```
 
-## File Structure
-```
-.
-├── .env                     # For IBM Quantum API token (ignored by git)
-├── .gitignore
-├── requirements.txt         # Project dependencies
-├── dpll_solver.py           # DPLL algorithm implementation
-├── backtrack_solver.py      # Backtracking algorithm implementation
-├── quantum_hardware_solver.py # Quantum Grover's algorithm for hardware
-├── dimacs_test_runner.py    # Main script for running solvers
-├── three_way_comparison.py  # Script for benchmarking the three solvers
-├── variable.py              # Helper class for solvers
-├── tests/                   # Test files in DIMACS format
-│   ├── test_simple.cnf
-│   └── ...
-└── README.md                # This file
-```
-
-
 ## 4. Legacy Quantum Solver (`quantum_solver.py`)
 This is the original, simulator-based implementation of Grover's algorithm. It is less feature-rich than the notebook version and does not support real hardware execution. It is kept for historical and comparative purposes. The `dimacs_test_runner.py` uses this solver when run with the `quantum` command.
 
@@ -136,45 +106,8 @@ This is the original, simulator-based implementation of Grover's algorithm. It i
 
 **Note:** Practical quantum speedup is not expected on current noisy, small-scale quantum computers. The primary goal of `demo_quantum.ipynb` is to demonstrate the complete workflow for executing a quantum algorithm on real hardware.
 
-## Test Runner (`dimacs_test_runner.py`)
-
-Unified test runner for the classical solvers and the legacy quantum solver.
-
-### Commands:
-```bash
-# Run DPLL solver
-python3 dimacs_test_runner.py test.cnf
-
-# Run legacy quantum solver (simulator only)
-python3 dimacs_test_runner.py quantum test.cnf
-
-# Compare all classical/legacy approaches
-python3 dimacs_test_runner.py compare test.cnf
-
-# Run all tests (from tests/ folder)
-python3 dimacs_test_runner.py all
-```
 
 **Note:** To run the modern, hardware-capable quantum solver, please use the `demo_quantum.ipynb` notebook.
-
-## DIMACS Format
-
-The DIMACS CNF format is the standard for representing SAT problems:
-
-```
-c This is a comment
-p cnf <num_variables> <num_clauses>
-<literal> <literal> ... 0
-...
-```
-
-### Example:
-```
-c (x1 ∨ x2) ∧ (¬x1 ∨ x3)
-p cnf 3 2
-1 2 0
--1 3 0
-```
 
 ## Files Structure
 
@@ -192,7 +125,7 @@ p cnf 3 2
 │   ├── test_unit.cnf
 │   ├── test_unsat.cnf
 │   └── ...
-└── README.md                # This file
+└── README.md                
 ```
 
 ## Research Applications
