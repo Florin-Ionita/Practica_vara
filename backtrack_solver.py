@@ -33,7 +33,6 @@ def get_all_variables(clauses):
 def backtrack_all_solutions(clauses, variables, assignment, var_index, solutions):
     """Backtracking algorithm to find all solutions by trying all possible assignments"""
     
-    # If we've assigned all variables, check if this assignment satisfies the formula
     if var_index == len(variables):
         if evaluate_formula(clauses, assignment):
             solutions.append(assignment[:])  # Make a copy
@@ -45,14 +44,14 @@ def backtrack_all_solutions(clauses, variables, assignment, var_index, solutions
     
     # Try assigning the variable to True
     assignment.append(var)
-    # Early termination: check if any clause is already falsified
+
     if not any(is_falsified(clause, assignment) for clause in clauses):
         backtrack_all_solutions(clauses, variables, assignment, var_index + 1, solutions)
     assignment.pop()  # Backtrack
     
     # Try assigning the variable to False
     assignment.append(-var)
-    # Early termination: check if any clause is already falsified
+
     if not any(is_falsified(clause, assignment) for clause in clauses):
         backtrack_all_solutions(clauses, variables, assignment, var_index + 1, solutions)
     assignment.pop()  # Backtrack
@@ -85,9 +84,6 @@ def find_all_solutions_backtrack(clauses):
         print(f"\n--- Verifying solution {len(verified_solutions) + 1} ---")
         if verify_solution(clauses, solution):
             verified_solutions.append(solution)
-            print("✓ Solution verified!")
-        else:
-            print("✗ Solution verification failed!")
     
     end_time = time.time()
     execution_time = end_time - start_time

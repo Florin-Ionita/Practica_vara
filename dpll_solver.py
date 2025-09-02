@@ -75,30 +75,3 @@ def find_first_solution_no_timing(clauses):
     """Find first solution without timing (uses DPLL)"""
     return dpll_first_solution(clauses, [])
 
-# Example usage (for testing the core DPLL algorithm)
-if __name__ == "__main__":
-    # Simple example
-    A = Variable("A")
-    B = Variable("B")
-    C = Variable("C")
-    
-    # (A or B) and (-A or C) and (-B or -C)
-    clauses = [
-        [A, B],
-        [-A, C],
-        [-B, -C]
-    ]
-    
-    # Test DPLL first solution
-    solution, exec_time = find_first_solution(clauses)
-    if solution is None:
-        print("UNSAT")
-    else:
-        print("First SAT assignment:", solution)
-        print(f"DPLL execution time: {exec_time:.6f} seconds")
-    
-    # Test backtracking all solutions
-    print("\n" + "="*50)
-    all_solutions, all_time = find_all_solutions(clauses)
-    print(f"\nBacktracking found {len(all_solutions)} solution(s)")
-    print(f"Backtracking execution time: {all_time:.6f} seconds")
